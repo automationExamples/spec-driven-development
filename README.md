@@ -1,43 +1,62 @@
-# Candidate Assessment: Spec-Driven Development With Codegen Tools
+# Banking Transaction System
 
-This assessment evaluates how you use modern code generation tools (for example `5.2-Codex`, `Claude`, `Copilot`, and similar) to design, build, and test a software application using a spec-driven development pattern. You may build a frontend, a backend, or both.
+A full-stack banking application built for the spec-driven-development assessment.
 
-## Goals
-- Build a working application with at least one meaningful feature.
-- Create a testing framework to validate the application.
-- Demonstrate effective use of code generation tools to accelerate delivery.
-- Show clear, maintainable engineering practices.
+## Features
+- Create bank accounts with initial balance
+- Deposit and withdraw funds
+- Transfer between accounts
+- View transaction history
+- Input validation and error handling
 
-## Deliverables
-- Application source code in this repository.
-- A test suite and test harness that can be run locally.
-- Documentation that explains how to run the app and the tests.
+## Tech Stack
+- **Backend:** FastAPI (Python)
+- **Database:** SQLite
+- **Frontend:** HTML/CSS/JavaScript
+- **Testing:** pytest, Playwright
 
-## Scope Options
-Pick one:
-- Frontend-only application.
-- Backend-only application.
-- Full-stack application.
+## Setup
 
-Your solution should include at least one real workflow, for example:
-- Create and view a resource.
-- Search or filter data.
-- Persist data in memory or storage.
+```bash
+# Clone and navigate
+git clone https://github.com/Farhod75/spec-driven-development.git
+cd spec-driven-development
 
-## Rules
-- You must use a code generation tool (for example `5.2-Codex`, `Claude`, or similar). You can use multiple tools.
-- You must build the application and a testing framework for it.
-- The application and tests must run locally.
-- Do not include secrets or credentials in this repository.
+# Create virtual environment
+python -m venv venv
+.\venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
 
-## Evaluation Criteria
-- Working product: Does the app do what it claims?
-- Test coverage: Do tests cover key workflows and edge cases?
-- Engineering quality: Clarity, structure, and maintainability.
-- Use of codegen: How effectively you used tools to accelerate work.
-- Documentation: Clear setup and run instructions.
+# Install dependencies
+pip install -r requirements.txt
+playwright install chromium
 
-## What to Submit
-- When you are complete, put up a Pull Request against this repository with your changes.
-- A short summary of your approach and tools used in your PR submission
-- Any additional information or approach that helped you.
+# Run the Application
+uvicorn app.main:app --reload --port 8000
+Open http://localhost:8000
+
+# Run Tests
+# API tests
+pytest tests/test_api.py -v
+
+# UI tests (server must be running)
+pytest tests/test_ui.py -v
+
+# All tests
+pytest -v
+
+API Endpoints
+Method	Endpoint	Description
+POST	/accounts	Create account
+GET	/accounts/{id}	Get account details
+POST	/accounts/{id}/deposit	Deposit funds
+POST	/accounts/{id}/withdraw	Withdraw funds
+POST	/transfers	Transfer between accounts
+GET	/accounts/{id}/transactions	Get transaction history
+
+# AI Tools Used
+
+Claude (Anthropic) - Code generation and debugging
+
+# Author
+Farhod Elbekov
