@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # FastAPI backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./generated_tests:/app/generated_tests
+    environment:
+      - DATABASE_PATH=/app/data/app.db
+      - GENERATED_TESTS_DIR=/app/generated_tests
+      - DEFAULT_TARGET_URL=http://example-api:8001
+    depends_on:
+      - example-api
+
+  # Streamlit UI
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./generated_tests:/app/generated_tests
+    environment:
+      - DATABASE_PATH=/app/data/app.db
+      - GENERATED_TESTS_DIR=/app/generated_tests
+      - DEFAULT_TARGET_URL=http://example-api:8001
+    depends_on:
+      - api
+
+  # Example target API for testing
+  example-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.example
+    ports:
+      - "8001:8001"
+
+volumes:
+  data:
+  generated_tests:
