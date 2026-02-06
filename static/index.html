@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Credit Risk Review Queue</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Credit Risk</p>
+          <h1>Review Queue</h1>
+          <p class="subtitle">Prioritize applications in a single ranked list.</p>
+        </div>
+      </header>
+
+      <section class="card">
+        <form id="insert-form" class="form">
+          <div class="field">
+            <label for="name">Applicant Name</label>
+            <input id="name" name="name" type="text" placeholder="Jane Doe" required />
+          </div>
+          <div class="field">
+            <label for="summary">Summary</label>
+            <input id="summary" name="summary" type="text" placeholder="Small business line of credit" required />
+          </div>
+          <div class="field">
+            <label for="position">Insert At Rank</label>
+            <input id="position" name="position" type="number" min="1" placeholder="1" />
+          </div>
+          <button type="submit">Add Application</button>
+        </form>
+        <div id="form-status" class="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Current Ranking</h2>
+          <button id="refresh" class="ghost" type="button">Refresh</button>
+        </div>
+        <div id="list" class="list"></div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
