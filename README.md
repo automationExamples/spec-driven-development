@@ -1,43 +1,84 @@
-# Candidate Assessment: Spec-Driven Development With Codegen Tools
+# Spec-Driven Task App
 
-This assessment evaluates how you use modern code generation tools (for example `5.2-Codex`, `Claude`, `Copilot`, and similar) to design, build, and test a software application using a spec-driven development pattern. You may build a frontend, a backend, or both.
+This repository contains a small spec-driven full-stack example: a FastAPI backend and a plain HTML + JavaScript frontend for managing tasks in memory.
 
-## Goals
-- Build a working application with at least one meaningful feature.
-- Create a testing framework to validate the application.
-- Demonstrate effective use of code generation tools to accelerate delivery.
-- Show clear, maintainable engineering practices.
+Project structure
+```
+backend/
+	main.py
+	models.py
+	routes.py
+	storage.py
+frontend/
+	index.html
+tests/
+	test_tasks.py
+requirements.txt
+README.md
+```
 
-## Deliverables
-- Application source code in this repository.
-- A test suite and test harness that can be run locally.
-- Documentation that explains how to run the app and the tests.
+Quickstart
 
-## Scope Options
-Pick one:
-- Frontend-only application.
-- Backend-only application.
-- Full-stack application.
+1. Install dependencies (recommended in a virtualenv):
 
-Your solution should include at least one real workflow, for example:
-- Create and view a resource.
-- Search or filter data.
-- Persist data in memory or storage.
+```bash
+pip install -r requirements.txt
+```
 
-## Rules
-- You must use a code generation tool (for example `5.2-Codex`, `Claude`, or similar). You can use multiple tools.
-- You must build the application and a testing framework for it.
-- The application and tests must run locally.
-- Do not include secrets or credentials in this repository.
+2. Run the backend:
 
-## Evaluation Criteria
-- Working product: Does the app do what it claims?
-- Test coverage: Do tests cover key workflows and edge cases?
-- Engineering quality: Clarity, structure, and maintainability.
-- Use of codegen: How effectively you used tools to accelerate work.
-- Documentation: Clear setup and run instructions.
+```bash
+python -m backend.main
+```
 
-## What to Submit
-- When you are complete, put up a Pull Request against this repository with your changes.
-- A short summary of your approach and tools used in your PR submission
-- Any additional information or approach that helped you.
+The API will be available at `http://127.0.0.1:8000` and the OpenAPI docs at `http://127.0.0.1:8000/docs`.
+
+# Spec-Driven Task Manager
+
+This repository contains a small full-stack Task Manager implemented using a spec-driven approach.
+
+Task spec (single source of truth):
+
+{
+  "id": "uuid",
+  "title": "string",
+  "description": "string",
+  "status": "pending | completed"
+}
+
+## Run the backend
+
+Install dependencies into a virtualenv, then run with Uvicorn:
+
+```bash
+python -m pip install -r requirements.txt
+uvicorn backend.main:app --reload --port 8000
+```
+
+The backend serves the API and the frontend. Open http://localhost:8000/ to use the web UI.
+
+API endpoints:
+- `POST /tasks` — create a task (JSON: title, description)
+- `GET /tasks` — list tasks
+- `GET /tasks?status=pending|completed` — filter tasks by status
+- `PATCH /tasks/{id}/status` — update a task's status (JSON: {status: "completed"})
+
+Test-only endpoint:
+- `POST /test/clear` — clears in-memory storage (used by the test suite)
+
+## Frontend
+
+Open http://localhost:8000/ in your browser. The single `index.html` page allows creating tasks, filtering, and toggling status.
+
+## Run tests
+
+```bash
+python -m pip install -r requirements.txt
+pytest -q
+```
+
+## How AI / Code generation tools were used
+
+- The project was implemented following a spec-driven workflow. Pydantic models were derived from the task spec and used for validation and OpenAPI generation.
+- Code generation tools were used to scaffold boilerplate (models, routes, storage) and to iterate on API shapes and tests, accelerating implementation while preserving human review and refinement.
+

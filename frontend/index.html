@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Spec-Driven Task Manager</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      form { margin-bottom: 1rem; }
+      .task { border: 1px solid #ddd; padding: 8px; margin-bottom: 6px; }
+    </style>
+  </head>
+  <body>
+    <h1>Tasks</h1>
+
+    <form id="createForm">
+      <input id="title" placeholder="Title" required />
+      <input id="description" placeholder="Description" required />
+      <button type="submit">Create</button>
+    </form>
+
+    <label>Filter:
+      <select id="filter">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+      </select>
+    </label>
+
+    <div id="tasks"></div>
+
+    <script>
+      const tasksEl = document.getElementById('tasks');
+      const form = document.getElementById('createForm');
+      const filter = document.getElementById('filter');
+
+      async function fetchTasks() {
+        const params = new URLSearchParams();
+        if (filter.value) params.set('status', filter.value);
+        const res = await fetch('/tasks' + (params.toString() ? `?${params}` : ''));
+        const data = await res.json();
+        renderTasks(data);
+      }
+
+      function renderTasks(list) {
+        tasksEl.innerHTML = '';
+        list.forEach(t => {
+          const d = document.createElement('div');
+          d.className = 'task';
+          d.innerHTML = `<strong>${escapeHtml(t.title)}</strong> - ${escapeHtml(t.description)}<br>Status: <em>${t.status}</em>`;
+          const btn = document.createElement('button');
+          btn.textContent = t.status === 'pending' ? 'Mark completed' : 'Mark pending';
+          btn.addEventListener('click', async () => {
+            const newStatus = t.status === 'pending' ? 'completed' : 'pending';
+            await fetch(`/tasks/${t.id}/status`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status: newStatus}) });
+            fetchTasks();
+          });
+          d.appendChild(document.createElement('br'));
+          d.appendChild(btn);
+          tasksEl.appendChild(d);
+        });
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        if (!title || !description) return;
+        await fetch('/tasks', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({title, description}) });
+        form.reset();
+        fetchTasks();
+      });
+
+      filter.addEventListener('change', fetchTasks);
+
+      function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
+      }
+
+      fetchTasks();
+    </script>
+  </body>
+</html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task App</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      form { margin-bottom: 20px; }
+      .task { border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Tasks</h1>
+
+    <form id="taskForm">
+      <div>
+        <label>Title: <input name="title" required /></label>
+      </div>
+      <div>
+        <label>Description: <input name="description" /></label>
+      </div>
+      <button type="submit">Create Task</button>
+    </form>
+
+    <div>
+      <label>Filter: 
+        <select id="filter">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="tasks"></div>
+
+    <script>
+      const apiBase = (location.protocol === 'file:') ? 'http://127.0.0.1:8000' : '';
+
+      async function fetchTasks() {
+        const status = document.getElementById('filter').value;
+        const q = status ? `?status=${status}` : '';
+        const res = await fetch(`${apiBase}/tasks${q}`);
+        const tasks = await res.json();
+        const container = document.getElementById('tasks');
+        container.innerHTML = '';
+        for (const t of tasks) {
+          const el = document.createElement('div');
+          el.className = 'task';
+          el.innerHTML = `<strong>${t.title}</strong> <em>(${t.status})</em><div>${t.description}</div>`;
+          container.appendChild(el);
+        }
+      }
+
+      document.getElementById('filter').addEventListener('change', fetchTasks);
+
+      document.getElementById('taskForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const data = { title: form.title.value, description: form.description.value };
+        const res = await fetch(`${apiBase}/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (res.ok) {
+          form.reset();
+          fetchTasks();
+        } else {
+          const err = await res.json();
+          alert('Error: ' + (err.detail || JSON.stringify(err)));
+        }
+      });
+
+      fetchTasks();
+    </script>
+  </body>
+</html>
